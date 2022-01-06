@@ -1,24 +1,30 @@
 # NgxCroppie
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.1.0.
+Image Cropper for angular X using [Croppie](https://github.com/Foliotek/Croppie)
 
-## Code scaffolding
+## Install
 
-Run `ng generate component component-name --project ngx-croppie` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ngx-croppie`.
-> Note: Don't forget to add `--project ngx-croppie` or else it will be added to the default project in your `angular.json` file. 
+Npm: `npm install ngx-croppie`
 
-## Build
 
-Run `ng build ngx-croppie` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Usage
 
-## Publishing
+Add the dependency:
 
-After building your library with `ng build ngx-croppie`, go to the dist folder `cd dist/ngx-croppie` and run `npm publish`.
+```
+    import { NgxCroppieModule } from 'ngx-croppie';
 
-## Running unit tests
+```
 
-Run `ng test ngx-croppie` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Use in Angular 2x component:
 
-## Further help
+with [Croppie options](http://foliotek.github.io/Croppie/#documentation): 
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```
+    <ngx-croppie [src]="source" options="{ viewport: { width: 400, height: 280 } }"></ngx-croppie>
+```
+
+Simple Example: (Soon)
+
+## Documentation
+[Documentation](http://foliotek.github.io/Croppie#documentation)
