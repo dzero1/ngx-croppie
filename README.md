@@ -21,7 +21,7 @@ Use in Angular 2x component:
 with [Croppie options](http://foliotek.github.io/Croppie/#documentation): 
 
 ```
-    <ngx-croppie [src]="source" options="{ viewport: { width: 400, height: 280 } }"></ngx-croppie>
+    <ngx-croppie [src]="source" [options]="{ viewport: { width: 200, height: 200 } }"></ngx-croppie>
 ```
 
 Simple Example: (Soon)
