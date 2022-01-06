@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 
 
 @Component({
@@ -7,14 +7,18 @@ import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular
   styleUrls: ['./ngx-croppie.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class NgxCroppieComponent implements OnInit {
+export class NgxCroppieComponent implements OnInit, AfterViewInit {
   @ViewChild('ngxcroppie') element:any;
 
   @Input() options:any = {
     url: ''
   };
+  private oldOptions:Object = {};
+
   @Input() src:Object = {};
   private oldSrc:Object = {};
+
+  private viewInit:boolean = false;
 
   private croppie:any;
 
@@ -24,9 +28,19 @@ export class NgxCroppieComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  ngAfterViewInit(): void {
+      this.viewInit = true;
+  }
+
   ngDoCheck() {
-    if (JSON.stringify(this.src) !== JSON.stringify(this.oldSrc)) {
+    if (this.viewInit && 
+        (
+            (JSON.stringify(this.src) !== JSON.stringify(this.oldSrc)) ||
+            (JSON.stringify(this.options) !== JSON.stringify(this.oldOptions))
+        )
+    ) {
       this.options.url = this.oldSrc = this.src;
+      this.oldOptions = this.options;
       this.initCroppie();
     }
   }
@@ -882,11 +896,11 @@ export class Croppie {
       const keyMove = (movement:any) => {
           let deltaX = movement[0],
               deltaY = movement[1],
-              newCss = {};
+              newCss:any = {};
 
           assignTransformCoordinates(deltaX, deltaY);
 
-          self.newCss[Croppie.CSS_TRANSFORM] = transform.toString();
+          newCss[Croppie.CSS_TRANSFORM] = transform.toString();
           self.css(self.elements.preview, newCss);
           self._updateOverlay.call(self);
           document.body.style[Croppie.CSS_USERSELECT] = '';
@@ -932,7 +946,7 @@ export class Croppie {
 
           let deltaX = pageX - originalX,
               deltaY = pageY - originalY,
-              newCss = {};
+              newCss:any = {};
 
           if (ev.type === 'touchmove') {
               if (ev.touches.length > 1) {
@@ -954,7 +968,7 @@ export class Croppie {
 
           assignTransformCoordinates(deltaX, deltaY);
 
-          self.newCss[Croppie.CSS_TRANSFORM] = transform.toString();
+          newCss[Croppie.CSS_TRANSFORM] = transform.toString();
           self.css(self.elements.preview, newCss);
           self._updateOverlay.call(self);
           originalY = pageY;
