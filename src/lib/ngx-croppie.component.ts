@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 
 
 @Component({
@@ -45,9 +45,33 @@ export class NgxCroppieComponent implements OnInit, AfterViewInit {
     }
   }
 
-  initCroppie(): void {
+  private initCroppie(): void {
     if (this.croppie) this.croppie.destroy()
     this.croppie = new Croppie(this.element.nativeElement, this.options);
+  }
+
+  public get(){
+      return this.croppie.get();
+  }
+
+  public rotate(degrees:number){
+      return this.croppie.rotate(degrees);
+  }
+
+  public setZoom(value:number){
+      return this.croppie.setZoom(value);
+  }
+
+  public destroy(){
+      return this.croppie.destroy();
+  }
+
+  public result(type:CroppieResultType = CroppieResultType.canvas, 
+                size:CroppieResultSize | Object = CroppieResultSize.viewport, 
+                format:CroppieResultFormat = CroppieResultFormat.png, 
+                quality:Number = 1,
+                circle:Boolean = false ): Promise<any>{
+      return this.croppie.result({type:type, size:size, format:format, quality:quality, circle:circle});
   }
 }
 
@@ -314,15 +338,16 @@ export class Croppie {
               img.setAttribute('crossOrigin', 'anonymous');
           }
 
-          img.onload = ()  =>{
-              /* if (doExif) {
-                  EXIF.getData(img, () => {
+          img.onload = () =>{
+              if (doExif) {
+                let win:any = window;
+                win.EXIF.getData(img, () => {
                     _resolve();
-                  });
+                });
               }
-              else { */
+              else {
                 _resolve();
-              // }
+              }
           };
           img.onerror = (ev:any) => {
               img.style.opacity = 1;
@@ -1016,7 +1041,8 @@ export class Croppie {
       }
 
       self.options.update.call(self, data);
-      if (self.$){ // && typeof Prototype === 'undefined') {
+      let win:any = window;
+      if (self.$ && typeof win.Prototype === 'undefined') {
           self.$(self.element).trigger('update.croppie', data);
       }
       else {
@@ -1297,12 +1323,12 @@ export class Croppie {
   }
 
   _replaceImage(img:any) {
-      if (this.elements.img.parentNode) {
-          Array.prototype.forEach.call(this.elements.img.classList, function(c) { img.classList.add(c); });
-          this.elements.img.parentNode.replaceChild(img, this.elements.img);
-          this.elements.preview = img; // if the img is attached to the DOM, they're not using the canvas
-      }
-      this.elements.img = img;
+    if (this.elements.img.parentNode) {
+        Array.prototype.forEach.call(this.elements.img.classList, function(c) { img.classList.add(c); });
+        this.elements.img.parentNode.replaceChild(img, this.elements.img);
+        this.elements.preview = img; // if the img is attached to the DOM, they're not using the canvas
+    }
+    this.elements.img = img;
   }
 
   _bind(options?:any, cb?:any) {
@@ -1335,47 +1361,49 @@ export class Croppie {
       self.data.boundZoom = zoom;
 
       return this.loadImage(url, hasExif).then((img:any) => {
-          self._replaceImage.call(self, img);
-          if (!points.length) {
-              let natDim = self.naturalImageDimensions(img);
-              let rect = self.elements.viewport.getBoundingClientRect();
-              let aspectRatio = rect.width / rect.height;
-              let imgAspectRatio = natDim.width / natDim.height;
-              let width, height;
+          self._replaceImage(img);
+          setTimeout(() => {
+            if (!points.length) {
+                let natDim = self.naturalImageDimensions(img);
+                let rect = self.elements.viewport.getBoundingClientRect();
+                let aspectRatio = rect.width / rect.height;
+                let imgAspectRatio = natDim.width / natDim.height;
+                let width, height;
 
-              if (imgAspectRatio > aspectRatio) {
-                  height = natDim.height;
-                  width = height * aspectRatio;
-              }
-              else {
-                  width = natDim.width;
-                  height = natDim.height / aspectRatio;
-              }
+                if (imgAspectRatio > aspectRatio) {
+                    height = natDim.height;
+                    width = height * aspectRatio;
+                }
+                else {
+                    width = natDim.width;
+                    height = natDim.height / aspectRatio;
+                }
 
-              let x0 = (natDim.width - width) / 2;
-              let y0 = (natDim.height - height) / 2;
-              let x1 = x0 + width;
-              let y1 = y0 + height;
-              self.data.points = [x0, y0, x1, y1];
-          }
-          else if (self.options.relative) {
-              points = [
-                  points[0] * img.naturalWidth / 100,
-                  points[1] * img.naturalHeight / 100,
-                  points[2] * img.naturalWidth / 100,
-                  points[3] * img.naturalHeight / 100
-              ];
-          }
+                let x0 = (natDim.width - width) / 2;
+                let y0 = (natDim.height - height) / 2;
+                let x1 = x0 + width;
+                let y1 = y0 + height;
+                self.data.points = [x0, y0, x1, y1];
+            }
+            else if (self.options.relative) {
+                points = [
+                    points[0] * img.naturalWidth / 100,
+                    points[1] * img.naturalHeight / 100,
+                    points[2] * img.naturalWidth / 100,
+                    points[3] * img.naturalHeight / 100
+                ];
+            }
 
-          self.data.points = points.map((p:any) => {
-              return parseFloat(p);
-          });
-          if (self.options.useCanvas) {
-            self._transferImageToCanvas.call(self, options.orientation);
-          }
-          self._updatePropertiesFromImage.call(self);
-          self._triggerUpdate.call(self);
-          cb && cb();
+            self.data.points = points.map((p:any) => {
+                return parseFloat(p);
+            });
+            if (self.options.useCanvas) {
+                self._transferImageToCanvas.call(self, options.orientation);
+            }
+            self._updatePropertiesFromImage.call(self);
+            self._triggerUpdate.call(self);
+            cb && cb();
+        }, 300);
       });
   }
 
@@ -1600,4 +1628,21 @@ export class TransformOrigin {
   toString () {
     return this.x + 'px ' + this.y + 'px';
   };
+}
+
+export enum CroppieResultType {
+    canvas = "canvas",
+    base64 = "base64",
+    html = "html",
+    blob = "blob",
+    rawcanvas = "rawcanvas",
+}
+export enum CroppieResultSize {
+    viewport = "viewport",
+    original = "original",
+}
+export enum CroppieResultFormat {
+    png = "png",
+    jpeg = "jpeg",
+    webp = "webp",
 }
