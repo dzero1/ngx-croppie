@@ -225,6 +225,42 @@ background: #ccc;
 }
 /*******************************************/
 
+
+
+
+/***********************************/
+/* Rotation Tools */
+/***********************************/
+
+.cr-rotate-left {
+    height: 32px;
+    width: 32px;
+    display: inline-block;
+    margin: 0 5px 5px 0;
+}
+.cr-rotate-right {
+    height: 32px;
+    width: 32px;
+    display: inline-block;
+    margin: 0 5px 5px 0;
+}
+.cr-flip-vertically {
+    height: 32px;
+    width: 32px;
+    display: inline-block;
+    margin: 0 5px 5px 0;
+}
+.cr-flip-horizontally {
+    height: 32px;
+    width: 32px;
+    display: inline-block;
+    margin: 0 5px 5px 0;
+}
+
+/*******************************************/
+
+
+
 /***********************************/
 /* Rotation Tools */
 /***********************************/

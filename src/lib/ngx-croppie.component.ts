@@ -105,6 +105,10 @@ export class Croppie {
     translate: 'translate3d'
   }
 
+  private lastOrientation:boolean = false;
+  private flippdVertically:boolean = false;
+  private flippdHorizontally:boolean = false;
+
   private defaults = {
     viewport: {
         width: 100,
@@ -658,7 +662,43 @@ export class Croppie {
   _initializeZoom() {
       var self:any = this,
           wrap = self.elements.zoomerWrap = document.createElement('div'),
-          zoomer = self.elements.zoomer = document.createElement('input');
+          zoomer = self.elements.zoomer = document.createElement('input'),
+          rotateLeft:any,
+          rotateRight:any,
+          flipVertically:any,
+          flipHorizontally:any;
+
+    if (self.options.enableOrientation){
+        rotateLeft = self.elements.rotateLeft = document.createElement('a'),
+        rotateRight = self.elements.rotateRight = document.createElement('a'),
+        flipVertically = self.elements.flipVertically = document.createElement('a'),
+        flipHorizontally = self.elements.flipHorizontally = document.createElement('a');
+
+
+      rotateLeft.innerHTML = `<svg width="24px" height="24px" enable-background="new 0 0 24 24" fill="#000000" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(-1,0,0,1,24,0)">
+          <rect width="24" height="24" fill="none"/>
+          </g>
+          <g transform="matrix(-1,0,0,1,24,0)">
+          <path d="m4.64 19.37c3.03 3.03 7.67 3.44 11.15 1.25l-1.46-1.46c-2.66 1.43-6.04 1.03-8.28-1.21-2.73-2.73-2.73-7.17 0-9.9 1.37-1.36 3.16-2.02 4.95-2.02v2.97l4-4-4-4v3.01c-2.3 0-4.61 0.87-6.36 2.63-3.52 3.51-3.52 9.21 0 12.73zm6.36-6.37 6 6 6-6-6-6z"/>
+          </g>
+        </svg>`
+      this.addClass(rotateLeft, 'cr-rotate-left');
+
+      rotateRight.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><g><path d="M4.64,19.37c3.03,3.03,7.67,3.44,11.15,1.25l-1.46-1.46c-2.66,1.43-6.04,1.03-8.28-1.21c-2.73-2.73-2.73-7.17,0-9.9 C7.42,6.69,9.21,6.03,11,6.03V9l4-4l-4-4v3.01c-2.3,0-4.61,0.87-6.36,2.63C1.12,10.15,1.12,15.85,4.64,19.37z M11,13l6,6l6-6l-6-6 L11,13z"/></g></g></svg>`
+      this.addClass(rotateRight, 'cr-rotate-right');
+
+      flipVertically.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M15 21h2v-2h-2v2zm4-12h2V7h-2v2zM3 5v14c0 1.1.9 2 2 2h4v-2H5V5h4V3H5c-1.1 0-2 .9-2 2zm16-2v2h2c0-1.1-.9-2-2-2zm-8 20h2V1h-2v22zm8-6h2v-2h-2v2zM15 5h2V3h-2v2zm4 8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2z"/></svg>`
+      this.addClass(flipVertically, 'cr-flip-vertically');
+
+      flipHorizontally.innerHTML = `<?xml version="1.0" encoding="UTF-8"?>
+        <svg width="24px" height="24px" fill="#000000" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0h24v24H0z" fill="none"/>
+        <path d="m3 15v2h2v-2zm12 4v2h2v-2zm4-16h-14c-1.1 0-2 0.9-2 2v4h2v-4h14v4h2v-4c0-1.1-0.9-2-2-2zm2 16h-2v2c1.1 0 2-0.9 2-2zm-20-8v2h22v-2zm6 8v2h2v-2zm12-4v2h2v-2zm-8 4v2h2v-2zm-8 0c0 1.1 0.9 2 2 2v-2z"/>
+        </svg>`;
+      this.addClass(flipHorizontally, 'cr-flip-horizontally');
+
+    }
 
       this.addClass(wrap, 'cr-slider-wrap');
       this.addClass(zoomer, 'cr-slider');
@@ -668,8 +708,74 @@ export class Croppie {
       zoomer.style.display = self.options.showZoomer ? '' : 'none';
       zoomer.setAttribute('aria-label', 'zoom');
 
+
       self.element.appendChild(wrap);
       wrap.appendChild(zoomer);
+      if (self.options.enableOrientation){
+        wrap.appendChild(rotateLeft);
+        wrap.appendChild(rotateRight);
+        // wrap.appendChild(flipVertically);
+        // wrap.appendChild(flipHorizontally);
+
+
+        self.elements.rotateLeft.addEventListener('click', ()=>{
+            self._rotate(self.flippdVertically || self.flippdHorizontally ? -90 : 90);
+        });
+        self.elements.rotateRight.addEventListener('click', ()=>{
+            self._rotate(self.flippdVertically || self.flippdHorizontally ? 90 : -90);
+        });
+       /*  self.elements.flipVertically.addEventListener('click', ()=>{
+          let or;
+          switch (self.data.orientation) {
+            case 1: or = 2; break;
+            case 2: or = 1; break;
+            case 3: or = 4; break;
+            case 4: or = 3; break;
+            case 5: or = 6; break;
+            case 6: or = 5; break;
+            case 7: or = 8; break;
+            case 8: or = 7; break;
+          }
+
+          self._bind({
+            url: self.options.url,
+            zoom: self.options.url,
+            points: self.options.points,
+            orientation: or
+          });
+
+          this.drawCanvas(self.elements.canvas, self.elements.img, self.data.orientation);
+          this._updateCenterPoint.call(self, true);
+          this._updateZoomLimits.call(self);
+
+        });
+
+        self.elements.flipHorizontally.addEventListener('click', ()=>{
+          let or;
+          switch (self.data.orientation) {
+            case 1: or = 4; break;
+            case 2: or = 3; break;
+            case 3: or = 2; break;
+            case 4: or = 1; break;
+            case 5: or = 8; break;
+            case 6: or = 7; break;
+            case 7: or = 6; break;
+            case 8: or = 5; break;
+          }
+
+          self._bind({
+            url: self.options.url,
+            zoom: self.options.url,
+            points: self.options.points,
+            orientation: or
+          });
+
+          this.drawCanvas(self.elements.canvas, self.elements.img, self.data.orientation);
+          this._updateCenterPoint.call(self, true);
+          this._updateZoomLimits.call(self);
+
+        }); */
+      }
 
       self._currentZoom = 1;
 
@@ -1513,6 +1619,7 @@ export class Croppie {
           canvas = self.elements.canvas;
 
       self.data.orientation = this.getExifOffset(self.data.orientation, deg);
+      console.log(self.data.orientation);
       this.drawCanvas(canvas, self.elements.img, self.data.orientation);
       this._updateCenterPoint.call(self, true);
       this._updateZoomLimits.call(self);
