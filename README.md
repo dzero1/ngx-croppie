@@ -4,7 +4,7 @@ Image Cropper for angular X using [Croppie](https://github.com/Foliotek/Croppie)
 
 ## Install
 
-Npm: `npm install ngx-croppie`
+Npm: `npm install ngx-croppie-plus`
 
 
 ## Usage
@@ -12,7 +12,7 @@ Npm: `npm install ngx-croppie`
 Add the dependency:
 
 ```
-    import { NgxCroppieModule } from 'ngx-croppie';
+    import { NgxCroppieModule } from 'ngx-croppie-plus';
 
 ```
 
