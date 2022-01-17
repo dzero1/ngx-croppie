@@ -1,0 +1,22 @@
+{
+  "name": "ngx-croppie-plus",
+  "version": "0.0.8",
+  "peerDependencies": {
+    "@angular/common": "^13.1.0",
+    "@angular/core": "^13.1.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "exports": {
+    "./ngx-croppie.css": {
+      "style": "./ngx-croppie.css"
+    }
+  },
+  "author": "Dananjaya M. Perera (dzero1) <dananjaya01@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dzero1/ngx-croppie/issues"
+  },
+  "homepage": "https://github.com/dzero1/ngx-croppie#readme"
+}
